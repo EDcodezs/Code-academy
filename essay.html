@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Making Research Readable — Enioluwa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #FAF6EE;
+    --paper-2: #F1EBDC;
+    --ink: #1E2A2E;
+    --ink-soft: #4A5A5C;
+    --rule: #D9D0BC;
+    --highlight: #F2C555;
+    --highlight-soft: #FBE9B8;
+    --teal: #3E6E6B;
+    --teal-deep: #294D4B;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html{ scroll-behavior: smooth; }
+
+  body{
+    margin:0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* subtle paper texture */
+  body::before{
+    content:"";
+    position: fixed;
+    inset:0;
+    pointer-events:none;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(30,42,46,0.025), transparent 40%),
+      radial-gradient(circle at 80% 60%, rgba(62,110,107,0.03), transparent 45%);
+    z-index:0;
+  }
+
+  .wrap{
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 28px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ---------- Header ---------- */
+  header{
+    padding: 72px 0 56px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .eyebrow{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--teal-deep);
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+  .eyebrow::before{
+    content:"";
+    width: 7px; height:7px;
+    background: var(--highlight);
+    border: 1px solid var(--ink);
+    display:inline-block;
+  }
+
+  h1{
+    font-family: 'Source Serif 4', serif;
+    font-weight: 600;
+    font-size: clamp(2.3rem, 5vw, 3.4rem);
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    margin: 0 0 18px;
+  }
+
+  .byline{
+    font-size: 15px;
+    color: var(--ink-soft);
+    display:flex;
+    gap: 18px;
+    flex-wrap:wrap;
+  }
+  .byline b{ color: var(--ink); font-weight: 600;}
+
+  /* ---------- Thesis / hero line ---------- */
+  .thesis{
+    padding: 56px 0 48px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .thesis p{
+    font-family: 'Source Serif 4', serif;
+    font-style: italic;
+    font-size: clamp(1.35rem, 3vw, 1.72rem);
+    line-height: 1.45;
+    color: var(--teal-deep);
+    margin: 0;
+  }
+  .thesis mark{
+    background: none;
+    color: inherit;
+    border-bottom: 3px solid var(--highlight);
+    padding-bottom: 1px;
+  }
+
+  /* ---------- Essay body ---------- */
+  article{
+    padding: 52px 0 8px;
+  }
+  article p{
+    font-size: 1.09rem;
+    line-height: 1.85;
+    margin: 0 0 26px;
+    color: var(--ink);
+  }
+  article p:first-of-type::first-letter{
+    font-family: 'Source Serif 4', serif;
+    font-size: 3.4em;
+    font-weight: 600;
+    float: left;
+    line-height: 0.82;
+    padding: 6px 8px 0 0;
+    color: var(--teal-deep);
+  }
+
+  .term{
+    background: linear-gradient(to bottom, transparent 62%, var(--highlight-soft) 62%);
+    cursor: help;
+    border-bottom: 1px dotted var(--teal-deep);
+    position: relative;
+  }
+  .term:hover, .term:focus{ outline: none; background: linear-gradient(to bottom, transparent 62%, var(--highlight) 62%); }
+
+  .tooltip{
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 10px);
+    transform: translateX(-50%) translateY(4px);
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.5;
+    padding: 10px 13px;
+    width: 210px;
+    border-radius: 3px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    z-index: 5;
+    pointer-events:none;
+  }
+  .tooltip::after{
+    content:"";
+    position:absolute;
+    top:100%; left:50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: var(--ink);
+  }
+  .term:hover .tooltip, .term:focus .tooltip{
+    opacity:1; visibility: visible; transform: translateX(-50%) translateY(0);
+  }
+
+  /* ---------- Demo panel: what the software would do ---------- */
+  .demo{
+    margin: 20px 0 60px;
+    border: 1px solid var(--rule);
+    background: var(--paper-2);
+    padding: 30px 30px 34px;
+  }
+  .demo-label{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--teal-deep);
+    margin-bottom: 16px;
+  }
+  .demo-sentence{
+    font-family: 'Source Serif 4', serif;
+    font-size: 1.18rem;
+    line-height: 1.7;
+    color: var(--ink);
+  }
+  .demo-caption{
+    margin-top: 18px;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+
+  /* ---------- Feature grid ---------- */
+  .features{
+    padding: 12px 0 60px;
+    border-top: 1px solid var(--rule);
+    margin-top: 8px;
+  }
+  .features h2{
+    font-family: 'Source Serif 4', serif;
+    font-weight: 600;
+    font-size: 1.5rem;
+    margin: 48px 0 28px;
+  }
+  .feature-list{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+  }
+  .feature{
+    background: var(--paper);
+    padding: 22px 24px;
+  }
+  .feature .tag{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--teal);
+    display:block;
+    margin-bottom: 8px;
+  }
+  .feature p{
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+
+  @media (max-width: 560px){
+    .feature-list{ grid-template-columns: 1fr; }
+    header{ padding-top: 52px; }
+  }
+
+  /* ---------- Footer ---------- */
+  footer{
+    border-top: 1px solid var(--rule);
+    padding: 44px 0 70px;
+  }
+  footer p{
+    font-family: 'Source Serif 4', serif;
+    font-style: italic;
+    font-size: 1.15rem;
+    line-height: 1.6;
+    color: var(--teal-deep);
+    max-width: 620px;
+  }
+  footer .sign{
+    margin-top: 26px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Sixth-Form Assignment · 20 July 2026</div>
+    <h1>A problem I want to solve<br>with my coding skills</h1>
+    <div class="byline"><b>Enioluwa</b><span>Personal essay</span></div>
+  </header>
+
+  <div class="thesis">
+    <p>What if the barrier between <mark>a curious student</mark> and <mark>a published discovery</mark> was just a piece of software?</p>
+  </div>
+
+  <article>
+    <p>Scientific research papers are one of the most valuable sources of knowledge, allowing scientists and researchers to communicate new discoveries that develop technology and deepen our understanding of the world. However, they are often difficult to understand for sixth-form students, such as me, who want to understand a topic more deeply. This therefore makes these papers inaccessible to some students, creating a barrier between students and current researchers. One problem I would like to solve is making scientific research papers more accessible to students through a piece of software that simplifies and organises complex information.</p>
+
+    <p>Although I have only recently started learning to code, I can already see how programming could be used to tackle this challenge. A program could allow a user to upload a research paper in PDF format before extracting the text and analysing its contents. It could identify important sections such as the <span class="term" tabindex="0">abstract, methodology, results and conclusion<span class="tooltip">The standard structural sections of a research paper, each carrying a different kind of information.</span></span>, then reorganise the information into a clearer and more structured format. The software could also search for difficult scientific terms within the document and display their <span class="term" tabindex="0">definitions alongside the text<span class="tooltip">Like a built-in glossary that appears exactly where you need it, instead of a separate search.</span></span>, reducing the need for students to constantly search for unfamiliar vocabulary themselves.</p>
+
+    <div class="demo">
+      <div class="demo-label">What this could look like — try hovering the underlined terms</div>
+      <p class="demo-sentence">The <span class="term" tabindex="0">catalytic hydrogenation<span class="tooltip">A chemical reaction sped up by a catalyst, adding hydrogen to a molecule.</span></span> exhibited <span class="term" tabindex="0">pseudo-first-order kinetics<span class="tooltip">The reaction rate depends on just one substance's concentration, even though more are involved.</span></span> with an <span class="term" tabindex="0">activation energy<span class="tooltip">The minimum energy needed to get the reaction started.</span></span> of 42 kJ/mol under <span class="term" tabindex="0">isothermal conditions<span class="tooltip">The temperature was kept constant throughout the experiment.</span></span>.</p>
+      <div class="demo-caption">One dense sentence from a real paper — instantly readable with a plain-English definition sitting right beside the jargon.</div>
+    </div>
+
+    <p>The program could also identify the key ideas within each section and generate concise summaries that highlight the most important information. Rather than reading an entire paper several times, students could first gain an overview before exploring the original research in greater depth. Other features could also be included such as automatically generating revision notes, producing simple diagrams to explain scientific processes, or allowing users to highlight sections and save personalised notes.</p>
+
+    <p>Creating a project like this would require me to learn many areas of programming, including reading and processing documents, organising large amounts of text, designing an intuitive user interface, and creating algorithms capable of recognising patterns within written information. While these are skills I have not yet developed, learning them would not only help me build this project but also strengthen my understanding of software development and problem-solving.</p>
+
+    <p>Ultimately, my goal would not be to replace scientific papers but to make them more approachable for students who are eager to learn. By combining programming with my passion for science, I hope that one day I will be able to develop software that encourages more students to engage with real scientific research and discover ideas that extend far beyond the classroom.</p>
+  </article>
+
+  <div class="features">
+    <h2>Features sketched out in the essay</h2>
+    <div class="feature-list">
+      <div class="feature">
+        <span class="tag">Input</span>
+        <p>Upload a research paper as a PDF; the software extracts and reads its text.</p>
+      </div>
+      <div class="feature">
+        <span class="tag">Structure</span>
+        <p>Detects abstract, methodology, results and conclusion, then reorganises them clearly.</p>
+      </div>
+      <div class="feature">
+        <span class="tag">Glossary</span>
+        <p>Flags difficult scientific terms and shows plain-English definitions alongside the text.</p>
+      </div>
+      <div class="feature">
+        <span class="tag">Summaries</span>
+        <p>Generates concise, section-by-section summaries of the key ideas.</p>
+      </div>
+      <div class="feature">
+        <span class="tag">Revision</span>
+        <p>Automatically produces revision notes from the paper's content.</p>
+      </div>
+      <div class="feature">
+        <span class="tag">Notes</span>
+        <p>Lets students highlight sections and save personalised notes and diagrams.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Not to replace the paper — to open the door to it.</p>
+    <div class="sign">Enioluwa</div>
+  </footer>
+
+</div>
+
+</body>
+</html>
